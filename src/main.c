@@ -1,15 +1,11 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "state.h"
+
 #define MAX_ACCEPTING_SIZE 1024
 
-struct State {
-  char symbol;
-  struct State *out;
-  struct State *eps_out;
-};
-
-int is_accepted(struct State* accepting[], struct State* state) {
+int is_accepted(struct state* accepting[], struct State* state) {
   int f = 0;
   for (int i = 0; i < MAX_ACCEPTING_SIZE; i++) {
     if (state == accepting[i]) {
@@ -21,10 +17,10 @@ int is_accepted(struct State* accepting[], struct State* state) {
 }
 
 int main() {
-  struct State q0;
-  struct State q1;
-  struct State q2;
-  struct State NOT_ACCEPTED; // Sentinel value
+  struct state q0;
+  struct state q1;
+  struct state q2;
+  struct state NOT_ACCEPTED; // Sentinel value
   
   q0.symbol = 'a';
   q0.out = &q1;
@@ -40,8 +36,8 @@ int main() {
   
   char s[] = "ab";
   int i = 0;
-  struct State *state = &q0; // Set to initial state first
-  struct State *accepting[MAX_ACCEPTING_SIZE];
+  struct state *state = &q0; // Set to initial state first
+  struct state *accepting[MAX_ACCEPTING_SIZE];
   accepting[0] = &q2;
 
   while (i < strlen(s)) {
