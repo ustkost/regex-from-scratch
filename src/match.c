@@ -2,71 +2,37 @@
 #include "match.h"
 #include "stack.h"
 
-int state_accepted(struct state *state, struct state *accepting_states[]) {
-  int f = 0;
-  for (int i = 0; i < MAX_ACCEPTING_SIZE; i++) {
-    if (state == accepting_states[i]) {
-      f = 1;
-      break;
-    }
-    if (state == NULL) {
-      break;
-    }
-  }
-  return f;
+int can_take(struct transition t, char s[], int i) {
+  if (!t.to) return 0;
+  if (t.sym == EPS) return 1;
+  return i < strlen(s) && t.sym == s[i];
 }
 
-int match_string(
-  char s[],
-  struct state *state,
-  struct state *accepting_states[MAX_ACCEPTING_SIZE]
-) {
+int match_string(char s[], struct state *state, struct state *accepting_state) {
   int i = 0;
-  struct state NOT_ACCEPTED; // Sentinel value
+  struct state NOT_ACCEPTED = {0};
   struct stack *stack = stack_create();
 
-  while (i < strlen(s)) {
-    /*
-     * First try to change the state to `out` (and save `eps_out`
-     * for backtracking), then try to change the state to `eps_out`
-     * If none of that worked, try to backtrack. If the stack is empty,
-     * exit the loop as the string is not accepted
-     */
-    if (state->out != NULL && state->symbol == s[i]) {
-      if (state->eps_out != NULL) {
-        stack_push(stack, stack_item_create(i, state->eps_out));
-      }
-      state = state->out;
-      i++;
+  while (1) {
+    struct transition t1 = state->t1;
+    struct transition t2 = state->t2;
 
-      if (i == strlen(s)) {
-        if (state_accepted(state, accepting_states) || stack_size(stack) == 0) {
-          break;
-        } else {
-          // Backtracking
-          struct stack_item *stack_item = stack_pop(stack);
-          state = stack_item->state;
-          i = stack_item->i;
-        }
-      }
-    } else if (state->eps_out != NULL) {
-      // We do not increment `i` because this is an epsilon transition
-      state = state->eps_out;
+    if (can_take(t1, s, i)) {
+      state = t1.to;
+      if (i < strlen(s) && t1.sym == s[i]) i++;
+      stack_push(stack, stack_item_create(i, t2.to));
+
+    } else if (can_take(t2, s, i)) {
+      state = t2.to;
+      if (i < strlen(s) && t2.sym == s[i]) i++;
+
     } else {
-      /*
-       * There is still more string left but there is no state
-       * to transition into; perhaps you are in a "trap" state?
-
-       * It is possible that `state` is in `accepting_states` when
-       * we are exiting the loop. Since such string can not be accepted,
-       * it is explicitly marked with `NOT_ACCEPTED` sentinel value
-       */
+      if (i == strlen(s) && state == accepting_state) break;
       if (stack_size(stack) == 0) {
         state = &NOT_ACCEPTED;
         break;
       }
 
-      // Backtracking
       struct stack_item *stack_item = stack_pop(stack);
       state = stack_item->state;
       i = stack_item->i;
@@ -74,6 +40,5 @@ int match_string(
   }
 
   stack_free(stack);
-
-  return state_accepted(state, accepting_states);
+  return state == accepting_state;
 }

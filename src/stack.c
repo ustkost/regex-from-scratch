@@ -21,7 +21,10 @@ void stack_push(struct stack *stack, struct stack_item *item) {
     printf("stack_push: stack is full");
     return;
   }
-  stack->items[stack->top++] = item;
+  // Push only if it exists
+  if (item->state) {
+    stack->items[stack->top++] = item;
+  }
 }
 
 struct stack_item *stack_pop(struct stack *stack) {

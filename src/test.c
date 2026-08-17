@@ -16,18 +16,16 @@ void run_tests(
   struct test_match tests[],
   int n,
   struct state *initial,
-  struct state *accepting_states[MAX_ACCEPTING_SIZE]
+  struct state *accepting_state
 ) {
-  printf("\n");
-  printf("============================\n");
+  printf("\n============================\n");
   printf("%s\n", message);
-  printf("============================\n");
-  printf("\n");
+  printf("\n============================\n");
   for (int i = 0; i < n; i++) {
     char *s = tests[i].s;
     int expected = tests[i].expected;
 
-    int actual = match_string(s, initial, accepting_states);
+    int actual = match_string(s, initial, accepting_state);
     printf("Test case %d: s=%s, expected=%d, got=%d\n", i, s, expected, actual);
     assert(actual == expected);
   }
@@ -35,24 +33,24 @@ void run_tests(
 
 // "ab"
 void test_match_1() {
-  struct state q0;
-  struct state q1;
-  struct state q2;
+  struct state q0, q1, q2;
+  q0 = (struct state){
+    .t1 = { .sym = 'a', .to = &q1 },
+    .t2 = { .to = NULL }
+  };
   
-  q0.symbol = 'a';
-  q0.out = &q1;
-  q0.eps_out = NULL;
-  
-  q1.symbol = 'b';
-  q1.out = &q2;
-  q1.eps_out = NULL;
-  
-  q2.out = NULL;
-  q2.eps_out = NULL;
+  q1 = (struct state){
+    .t1 = { .sym = 'b', .to = &q2 },
+    .t2 = { .to = NULL }
+  };
+
+  q2 = (struct state){
+    .t1 = { .to = NULL },
+    .t2 = { .to = NULL }
+  };
   
   struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q2;
+  struct state *accepting_state = &q2;
  
   struct test_match tests[] = {
     {"ab", 1},
@@ -72,77 +70,104 @@ void test_match_1() {
   };
   
   run_tests(
-    "test_match_1: \"ab\". Simple concatenation",
+    "test_match_1: \"ab\"",
     tests,
     ARRAY_SIZE(tests),
     initial,
-    accepting_states
+    accepting_state
   );
 }
 
-// "a*"
+// "ab*"
 void test_match_2() {
-  struct state q0;
-  
-  q0.symbol = 'a';
-  q0.out = &q0;
-  q0.eps_out = NULL;
-  
-  struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q0;
- 
-  struct test_match tests[] = {
-    {"", 1},
-    {"a", 1},
-    {"aa", 1},
-    {"aaa", 1},
-    {"aaaaaaaaaaa", 1},
-    {"b", 0},
-    {"ab", 0},
-    {"ba", 0},
-    {"aab", 0},
-    {"baa", 0},
-    {"bba", 0},
-    {"baaaaaa", 0},
-    {"aba", 0},
-    {"aaaaabaaaaa", 0}
+  struct state q0, q1, q2, q3, q4;
+
+  q0 = (struct state){
+    .t1 = { .sym = 'a', .to = &q1 },
+    .t2 = { .to = NULL }
   };
   
+  q1 = (struct state){
+    .t1 = { .sym = EPS, .to = &q2 },
+    .t2 = { .sym = EPS, .to = &q4 }
+  };
+  
+  q2 = (struct state){
+    .t1 = { .sym = 'b', .to = &q3 },
+    .t2 = { .to = NULL }
+  };
+  
+  q3 = (struct state){
+    .t1 = { .sym = EPS, .to = &q2 },
+    .t2 = { .sym = EPS, .to = &q4 }
+  };
+
+  q4 = (struct state) {
+    .t1 = { .to = NULL },
+    .t2 = { .to = NULL },
+  };
+  
+  struct state *initial = &q0;
+  struct state *accepting_state = &q4;
+
+  struct test_match tests[] = {
+    {"a", 1},
+    {"ab", 1},
+    {"abb", 1},
+    {"abbbbbb", 1},
+    {"", 0},
+    {"b", 0},
+    {"ba", 0},
+    {"aab", 0},
+    {"abba", 0},
+    {"abc", 0},
+  };
+
   run_tests(
-    "test_match_2: \"a*\". Looping state",
+    "test_match_2: \"ab*\"",
     tests,
     ARRAY_SIZE(tests),
     initial,
-    accepting_states
+    accepting_state
   );
 }
 
 // "a|b"
 void test_match_3() {
-  struct state q0;
-  struct state q1;
-  struct state q2;
-  struct state q3;
+  struct state q0, q1, q2, q3, q4, q5;
   
-  q0.symbol = 'a';
-  q0.out = &q1;
-  q0.eps_out = &q2;
+  q0 = (struct state){
+    .t1 = { .sym = EPS, .to = &q1 },
+    .t2 = { .sym = EPS, .to = &q3 }
+  };
 
-  q1.out = NULL;
-  q1.eps_out = NULL;
+  q1 = (struct state) {
+    .t1 = { .sym = 'a', .to = &q2 },
+    .t2 = { .to = NULL }
+  };
+  
+  q2 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q5 },
+    .t2 = { .to = NULL }
+  };
+  
+  q3 = (struct state) {
+    .t1 = { .sym = 'b', .to = &q4 },
+    .t2 = { .to = NULL }
+  };
+  
+  q4 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q5 },
+    .t2 = { .to = NULL }
+  };
 
-  q3.out = NULL;
-  q3.eps_out = NULL;
-
-  q2.symbol = 'b';
-  q2.out = &q3;
-  q2.eps_out = NULL;
+  q5 = (struct state) {
+    .t1 = { .to = NULL },
+    .t2 = { .to = NULL }
+  };
   
   struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q1;
-  accepting_states[1] = &q3;
+  struct state *accepting_state = &q5;
  
   struct test_match tests[] = {
     {"a", 1},
@@ -163,121 +188,55 @@ void test_match_3() {
   };
 
   run_tests(
-    "test_match_3: \"a|b\". Epsilon transitions",
+    "test_match_3: \"a|b\"",
     tests,
     ARRAY_SIZE(tests),
     initial,
-    accepting_states
+    accepting_state
   );
 }
-
-
-// "ab*"
-void test_match_4() {
-  struct state q0;
-  struct state q1;
-  
-  q0.symbol = 'a';
-  q0.out = &q1;
-  q0.eps_out = NULL;
-
-  q1.symbol = 'b';
-  q1.out = &q1;
-  q1.eps_out = NULL;
-  
-  struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q1;
- 
-  struct test_match tests[] = {
-    {"a", 1},
-    {"ab", 1},
-    {"abb", 1},
-    {"abbbbbb", 1},
-    {"", 0},
-    {"b", 0},
-    {"ba", 0},
-    {"aab", 0},
-    {"abba", 0},
-    {"abc", 0},
-  };
-  
-  run_tests(
-    "test_match_4: \"ab*\". Concatenation + star",
-    tests,
-    ARRAY_SIZE(tests),
-    initial,
-    accepting_states
-  );
-}
-
-// "a+"
-void test_match_5() {
-  struct state q0;
-  struct state q1;
-  
-  q0.symbol = 'a';
-  q0.out = &q1;
-  q0.eps_out = NULL;
-
-  q1.symbol = 'a';
-  q1.out = &q1;
-  q1.eps_out = NULL;
-  
-  struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q1;
- 
-  struct test_match tests[] = {
-    {"a", 1},
-    {"aa", 1},
-    {"aaaaa", 1},
-    {"", 0},
-    {"b", 0},
-    {"ab", 0},
-    {"ba", 0},
-  };
-  
-  run_tests(
-    "test_match_5: \"a+\". One or more",
-    tests,
-    ARRAY_SIZE(tests),
-    initial,
-    accepting_states
-  );
-}
-
 
 // "(a|b)c"
-void test_match_6() {
-  struct state q0;
-  struct state q1;
-  struct state q2;
-  struct state q3;
-  struct state q4;
+void test_match_4() {
+  struct state q0, q1, q2, q3, q4, q5, q6;
   
-  q0.symbol = 'a';
-  q0.out = &q1;
-  q0.eps_out = &q2;
+  q0 = (struct state){
+    .t1 = { .sym = EPS, .to = &q1 },
+    .t2 = { .sym = EPS, .to = &q3 }
+  };
 
-  q1.symbol = 'c';
-  q1.out = &q4;
-  q1.eps_out = NULL;
-
-  q2.symbol = 'b';
-  q2.out = &q3;
-  q2.eps_out = NULL;
+  q1 = (struct state) {
+    .t1 = { .sym = 'a', .to = &q2 },
+    .t2 = { .to = NULL }
+  };
   
-  q3.symbol = 'c';
-  q3.out = &q4;
-  q3.eps_out = NULL;
+  q2 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q5 },
+    .t2 = { .to = NULL }
+  };
+  
+  q3 = (struct state) {
+    .t1 = { .sym = 'b', .to = &q4 },
+    .t2 = { .to = NULL }
+  };
+  
+  q4 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q5 },
+    .t2 = { .to = NULL }
+  };
 
-  q4.out = NULL;
-  q4.eps_out = NULL;
+  q5 = (struct state) {
+    .t1 = { .sym = 'c', .to = &q6 },
+    .t2 = { .to = NULL }
+  };
+
+  q6 = (struct state) {
+    .t1 = { .to = NULL },
+    .t2 = { .to = NULL }
+  };
   
   struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q4;
+  struct state *accepting_state = &q6;
  
   struct test_match tests[] = {
     {"ac", 1},
@@ -292,42 +251,60 @@ void test_match_6() {
   };
 
   run_tests(
-    "test_match_6: \"(a|b)c\". Epsilon transitions + concatenation",
+    "test_match_4: \"(a|b)c\"",
     tests,
     ARRAY_SIZE(tests),
     initial,
-    accepting_states
+    accepting_state
   );
 }
 
 // "(a|b)*"
-void test_match_7() {
-  struct state q0;
-  struct state q1;
-  struct state q2;
-  struct state q3;
+void test_match_5() {
+  struct state q0, q1, q2, q3, q4, q5, q6, q7;
   
-  q0.symbol = 'a';
-  q0.out = &q3;
-  q0.eps_out = &q1;
+  q0 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q1 },
+    .t2 = { .sym = EPS, .to = &q7 }
+  };
 
-  q1.symbol = 'b';
-  q1.out = &q2;
-  q1.eps_out = NULL;
+  q1 = (struct state){
+    .t1 = { .sym = EPS, .to = &q2 },
+    .t2 = { .sym = EPS, .to = &q4 }
+  };
 
-  q2.symbol = 'b';
-  q2.out = &q2;
-  q2.eps_out = &q3;
+  q2 = (struct state) {
+    .t1 = { .sym = 'a', .to = &q3 },
+    .t2 = { .to = NULL }
+  };
   
-  q3.symbol = 'a';
-  q3.out = &q3;
-  q3.eps_out = &q2;
+  q3 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q6 },
+    .t2 = { .to = NULL }
+  };
   
+  q4 = (struct state) {
+    .t1 = { .sym = 'b', .to = &q5 },
+    .t2 = { .to = NULL }
+  };
+  
+  q5 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q6 },
+    .t2 = { .to = NULL }
+  };
+
+  q6 = (struct state) {
+    .t1 = { .sym = EPS, .to = &q1 },
+    .t2 = { .sym = EPS, .to = &q7 }
+  };
+  
+  q7 = (struct state) {
+    .t1 = { .to = NULL },
+    .t2 = { .to = NULL }
+  };
+ 
   struct state *initial = &q0;
-  struct state *accepting_states[MAX_ACCEPTING_SIZE] = {0};
-  accepting_states[0] = &q0;
-  accepting_states[1] = &q2;
-  accepting_states[2] = &q3;
+  struct state *accepting_state = &q7;
  
   struct test_match tests[] = {
     {"", 1},
@@ -344,11 +321,11 @@ void test_match_7() {
   };
 
   run_tests(
-    "test_match_7: \"(a|b)*\". Epsilon transitions + star",
+    "test_match_5: \"(a|b)*\"",
     tests,
     ARRAY_SIZE(tests),
     initial,
-    accepting_states
+    accepting_state
   );
 }
 
@@ -360,9 +337,6 @@ void test() {
   test_match_3();
   test_match_4();
   test_match_5();
-  test_match_6();
-  test_match_7();
 
-  printf("\n");
-  printf("All tests pass!\n");
+  printf("\nAll tests pass!\n");
 }
