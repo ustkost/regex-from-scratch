@@ -9,6 +9,9 @@ int state_accepted(struct state *state, struct state *accepting_states[]) {
       f = 1;
       break;
     }
+    if (state == NULL) {
+      break;
+    }
   }
   return f;
 }

@@ -9,8 +9,6 @@ struct state {
   struct state *eps_out;
 };
 
-int state_accepted(struct state *state, struct state *accepting_states[]);
-
 int match_string(
   char s[],
   struct state *initial,
