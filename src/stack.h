@@ -1,7 +1,7 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include "state.h"
+#include "match.h"
 
 #define MAX_STACK_SIZE 4096
 
