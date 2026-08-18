@@ -11,6 +11,8 @@ void test_preproc();
 
 void test_parser();
 
+void test_e2e();
+
 void test();
 
 #endif

@@ -35,7 +35,7 @@ void test_parser() {
   };
 
   printf("\n============================\n");
-  printf("%s\n", "test_parser");
+  printf("test_parser\n");
   printf("============================\n\n");
   for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
     char *s = tests[i].s;

@@ -28,7 +28,7 @@ void test_preproc() {
   };
 
   printf("\n============================\n");
-  printf("%s\n", "test_preproc");
+  printf("test_preproc\n");
   printf("============================\n\n");
   for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
     char *s = tests[i].s;

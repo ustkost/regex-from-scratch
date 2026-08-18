@@ -117,7 +117,7 @@ void test_match_2() {
     {"ba", 0},
     {"aab", 0},
     {"abba", 0},
-    {"abc", 0},
+    {"abc", 0}
   };
 
   run_tests(

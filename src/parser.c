@@ -6,17 +6,6 @@
 
 #define ARRAY_SIZE(x) ((sizeof x) / (sizeof *x))
 
-struct operator {
-  char op;
-  int prec;
-};
-
-struct operator operators[] = {
-  {'*', 3},
-  {'.', 2},
-  {'|', 1}
-};
-
 int is_lit(char c) {
   char non_literals[] = "*.|()";
   for (int i = 0; non_literals[i] != '\0'; i++) {
@@ -24,6 +13,12 @@ int is_lit(char c) {
   }
   return 1;
 }
+
+struct operator operators[] = {
+  {'*', 3},
+  {'.', 2},
+  {'|', 1}
+};
 
 int is_op(char c) {
   for (int i = 0; i < ARRAY_SIZE(operators); i++) {

@@ -17,5 +17,7 @@ void test() {
 
   test_parser();
 
+  test_e2e();
+
   printf("\nAll tests pass!\n");
 }
