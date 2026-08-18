@@ -1,18 +1,12 @@
 #ifndef MATCH_H
 #define MATCH_H
 
-#define EPS 256
+#include "thompson.h"
 
-struct transition {
-  int sym;
-  struct state *to;
-};
-
-struct state {
-  struct transition t1;
-  struct transition t2;
-};
-
-int match_string(char s[], struct state *initial, struct state *accepting_state);
+int match_string(
+  const char s[],
+  const struct state *initial,
+  const struct state *accepting_state
+);
 
 #endif

@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include "thompson.h"
+#include "print.h"
 #include "stack.h"
 
 #define MAX_TRANSITION_COUNT 1024
 
-int is_visited(
+static int is_visited(
   struct state *visited[MAX_TRANSITION_COUNT],
-  struct state *item,
+  const struct state *item,
   int visitor_count
 ) {
   for (int i = 0; i < visitor_count; i++) {
@@ -15,9 +15,9 @@ int is_visited(
   return 0;
 }
 
-int get_ind(
+static int get_ind(
   struct state *visited[MAX_TRANSITION_COUNT],
-  struct state *item,
+  const struct state *item,
   int visitor_count
 ) {
   for (int i = 0; i < visitor_count; i++) {
@@ -26,7 +26,7 @@ int get_ind(
   return -1;
 }
 
-void print(struct fragment *f) {
+void print(const struct fragment *f) {
   struct state *visited[MAX_TRANSITION_COUNT] = {0};
   int visitor_count = 0;
   struct stack *stack = stack_create();
@@ -45,7 +45,7 @@ void print(struct fragment *f) {
 
   for (int i = 0; i < visitor_count; i++) {
     struct state *s = visited[i];
-    printf("addr=%d\n", s);
+    printf("addr=%p\n", s);
     if (s == &f->s) printf("(initial)\n");
     if (s == &f->t) printf("(accepting)\n");
     if (s->t1.to) {
@@ -69,7 +69,4 @@ void print(struct fragment *f) {
     }
     printf("\n");
   }
-
-  struct state *accepting = &f->t;
-  printf("accepting=%d\n", accepting);
 }

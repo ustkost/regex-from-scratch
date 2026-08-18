@@ -1,7 +1,17 @@
 #ifndef THOMPSON_H
 #define THOMPSON_H
 
-#include "match.h"
+#define EPS 256
+
+struct transition {
+  int sym;
+  struct state *to;
+};
+
+struct state {
+  struct transition t1;
+  struct transition t2;
+};
 
 struct fragment {
   struct state s;

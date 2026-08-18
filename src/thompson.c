@@ -1,16 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "match.h"
+#include "thompson.h"
 #include "stack.h"
 #include "parser.h"
-#include "thompson.h"
 
-struct fragment {
-  struct state s;
-  struct state t;
-};
-
-struct fragment *create_fragment() {
+static struct fragment *create_fragment() {
   struct fragment *f = malloc(sizeof(struct fragment));
   f->s = (struct state){
     .t1 = { .to = NULL },
@@ -28,14 +22,12 @@ struct fragment *thompson(const char *postfix_regex) {
   for (int i = 0; postfix_regex[i] != '\0'; i++) {
     char c = postfix_regex[i];
     if (is_lit(c)) {
-      // printf("hi im lit\n");
       struct fragment *f = create_fragment();
       f->s.t1 = (struct transition){ .sym = c, .to = &f->t };
       stack_push(stack, f);
     } else if (is_op(c)) {
       switch (c) {
         case '.': {
-          // printf("this case\n");
           struct fragment *rhs = stack_pop(stack);
           struct fragment *lhs = stack_pop(stack);
           struct fragment *f = create_fragment();
@@ -46,7 +38,6 @@ struct fragment *thompson(const char *postfix_regex) {
           stack_push(stack, f);
           break;
         } case '|': {
-          // printf("that case\n");
           struct fragment *rhs = stack_pop(stack);
           struct fragment *lhs = stack_pop(stack);
           struct fragment *f = create_fragment();
@@ -61,7 +52,6 @@ struct fragment *thompson(const char *postfix_regex) {
           stack_push(stack, f);
           break;
         } case '*': {
-          // printf(" case 3\n");
           struct fragment *p = stack_pop(stack);
           struct fragment *f = create_fragment();
           

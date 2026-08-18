@@ -3,6 +3,6 @@
 
 #include "thompson.h"
 
-void print(struct fragment *f);
+void print(const struct fragment *f);
 
 #endif

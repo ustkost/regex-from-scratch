@@ -8,12 +8,12 @@ struct test_match {
   int expected;
 };
 
-void run_tests(
-  char message[],
-  struct test_match tests[],
+static void run_tests(
+  const char message[],
+  const struct test_match tests[],
   int n,
-  struct state *initial,
-  struct state *accepting_state
+  const struct state *initial,
+  const struct state *accepting_state
 ) {
   printf("\n============================\n");
   printf("%s\n", message);

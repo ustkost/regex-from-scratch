@@ -4,13 +4,29 @@
 #include "match.h"
 #include "stack.h"
 
-int can_take(struct transition t, char s[], int i) {
+struct backtrack_entry {
+  struct state *state;
+  int i;
+};
+
+static struct backtrack_entry *backtrack_entry_create(int i, const struct state *s) {
+  struct backtrack_entry *be = malloc(sizeof(struct backtrack_entry));
+  be->i = i;
+  be->state = s;
+  return be;
+}
+
+static int can_take(struct transition t, const char s[], int i) {
   if (!t.to) return 0;
   if (t.sym == EPS) return 1;
   return i < strlen(s) && t.sym == s[i];
 }
 
-int match_string(char s[], struct state *state, struct state *accepting_state) {
+int match_string(
+  const char s[],
+  const struct state *state,
+  const struct state *accepting_state
+) {
   int i = 0;
   struct state NOT_ACCEPTED = {0};
   struct stack *stack = stack_create();

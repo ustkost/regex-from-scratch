@@ -2,20 +2,13 @@
 #include <stdio.h>
 #include "stack.h"
 
-struct backtrack_entry *backtrack_entry_create(int i, struct state *state) {
-  struct backtrack_entry *be = malloc(sizeof(struct backtrack_entry));
-  be->i = i;
-  be->state = state;
-  return be;
-}
-
 struct stack *stack_create() {
   struct stack *stack = malloc(sizeof(struct stack));
   stack->top = 0;
   return stack;
 }
 
-void stack_push(struct stack *stack, void *item) {
+void stack_push(struct stack *stack, const void *item) {
   if (stack->top == MAX_STACK_SIZE - 1) {
     printf("stack_push: stack is full\n");
     return;
@@ -31,7 +24,7 @@ void *stack_pop(struct stack *stack) {
   return stack->items[--stack->top];
 }
 
-void *stack_peek(struct stack *stack) {
+void *stack_peek(const struct stack *stack) {
   if (stack->top == 0) {
     printf("stack_peek: stack is empty\n");
     return NULL;
@@ -43,11 +36,8 @@ void stack_free_items(struct stack *stack) {
   for (int i = 0; i < stack->top; i++) {
     free(stack->items[i]);
   }
-  for (int i = 0; i < stack->to_free_top; i++) {
-    free(stack->to_free[i]);
-  }
 }
 
-int stack_empty(struct stack *stack) {
+int stack_empty(const struct stack *stack) {
   return stack->top == 0;
 }

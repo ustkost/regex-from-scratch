@@ -1,7 +1,4 @@
-#include <assert.h>
-#include <stddef.h>
 #include <stdio.h>
-
 #include "test.h"
 
 void test() {

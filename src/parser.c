@@ -1,50 +1,44 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
 #include "parser.h"
+#include "stack.h"
 
-#define ARRAY_SIZE(x) ((sizeof x) / (sizeof *x))
-
-int is_lit(char c) {
-  char non_literals[] = "*.|()";
-  for (int i = 0; non_literals[i] != '\0'; i++) {
-    if (c == non_literals[i]) return 0;
-  }
-  return 1;
-}
-
-struct operator operators[] = {
+struct operator ops[] = {
   {'*', 3},
   {'.', 2},
   {'|', 1}
 };
 
 int is_op(char c) {
-  for (int i = 0; i < ARRAY_SIZE(operators); i++) {
-    if (c == operators[i].op) return 1;
+  for (int i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+    if (c == ops[i].op) return 1;
   }
   return 0;
 }
 
-int op_prec(char c) {
- for (int i = 0; i < ARRAY_SIZE(operators); i++) {
-    if (c == operators[i].op) {
-      return operators[i].prec;
+int is_lit(char c) {
+  return !is_op(c) && c != '(' && c != ')';
+}
+
+static int get_op_prec(char c) {
+ for (int i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+    if (c == ops[i].op) {
+      return ops[i].prec;
     }
   }
   return -1;
 }
 
-int can_start_expr(char c) {
+static int can_start_expr(char c) {
   return is_lit(c) || c == '(';
 }
 
-int can_end_expr(char c) {
+static int can_end_expr(char c) {
   return is_lit(c) || c == ')' || c == '*';
 }
 
-void preprocess(char *regex, char *output) {
+void preprocess(const char *regex, char *output) {
   int j = 0;
   for (int i = 0; regex[i] != '\0'; i++) {
     char current = regex[i];
@@ -62,14 +56,15 @@ void preprocess(char *regex, char *output) {
   output[j] = '\0';
 }
 
-char stack_peek_char(struct stack *s) {
+static char peek_char(const struct stack *s) {
   return *(char*)stack_peek(s);
 }
-char stack_pop_char(struct stack *s) {
+
+static char pop_char(struct stack *s) {
   return *(char*)stack_pop(s);
 }
 
-int parser(char *regex, char *output, char *error) {
+int parser(const char *regex, char *output, char *error) {
   int j = 0;
   char s[MAX_PARSER_OUTPUT];
   preprocess(regex, s);
@@ -82,19 +77,19 @@ int parser(char *regex, char *output, char *error) {
     } else if (is_op(c)) {
       while (
         !stack_empty(stack) &&
-        is_op(stack_peek_char(stack)) &&
-        op_prec(stack_peek_char(stack)) >= op_prec(c)
+        is_op(peek_char(stack)) &&
+        get_op_prec(peek_char(stack)) >= get_op_prec(c)
       ) {
-        output[j++] = stack_pop_char(stack);
+        output[j++] = pop_char(stack);
       }
       stack_push(stack, &s[i]);
     } else if (c == '(') {
       stack_push(stack, &s[i]);
     } else if (c == ')') {
-      while (!stack_empty(stack) && stack_peek_char(stack) != '(') {
-        output[j++] = stack_pop_char(stack);
+      while (!stack_empty(stack) && peek_char(stack) != '(') {
+        output[j++] = pop_char(stack);
       }
-      if (!stack_empty(stack) && stack_peek_char(stack) == '(') {
+      if (!stack_empty(stack) && peek_char(stack) == '(') {
         stack_pop(stack);
       } else {
         sprintf(error, "unmatched ')' at position %d", i);
@@ -105,7 +100,7 @@ int parser(char *regex, char *output, char *error) {
   }
   
   while (!stack_empty(stack)) {
-    char c = stack_pop_char(stack);
+    char c = pop_char(stack);
     if (c == '(') {
       sprintf(error, "unmatched '(' (unclosed at the end of expression)");
       free(stack);
