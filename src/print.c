@@ -45,6 +45,7 @@ void print(struct fragment *f) {
 
   for (int i = 0; i < visitor_count; i++) {
     struct state *s = visited[i];
+    printf("addr=%d\n", s);
     if (s == &f->s) printf("(initial)\n");
     if (s == &f->t) printf("(accepting)\n");
     if (s->t1.to) {
@@ -68,4 +69,7 @@ void print(struct fragment *f) {
     }
     printf("\n");
   }
+
+  struct state *accepting = &f->t;
+  printf("accepting=%d\n", accepting);
 }
