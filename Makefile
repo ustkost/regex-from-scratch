@@ -2,7 +2,7 @@
 
 TARGET_EXEC := regex
 BUILD_DIR := ./build
-SRC_DIRS := ./src
+SRC_DIRS := ./src ./test
 SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)

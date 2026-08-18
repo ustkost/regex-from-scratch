@@ -5,23 +5,25 @@
 
 #define MAX_STACK_SIZE 4096
 
-struct stack_item {
+struct backtrack_entry {
   struct state *state;
   int i;
 };
 
-struct stack_item *stack_item_create(int, struct state*);
+struct backtrack_entry *backtrack_entry_create(int i, struct state *state);
 
 struct stack {
-  struct stack_item *items[MAX_STACK_SIZE];
+  void *items[MAX_STACK_SIZE];
   int top;
-  int capacity;
+  void *to_free[MAX_STACK_SIZE];
+  int to_free_top;
 };
 
 struct stack *stack_create();
-void stack_push(struct stack*, struct stack_item*);
-struct stack_item *stack_pop(struct stack*);
-int stack_size(struct stack*);
-void stack_free(struct stack*);
+void stack_push(struct stack *stack, void *item);
+void *stack_pop(struct stack *stack);
+void *stack_peek(struct stack *stack);
+int stack_empty(struct stack *stack);
+void stack_free_items(struct stack *stack);
 
 #endif

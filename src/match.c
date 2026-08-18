@@ -1,4 +1,6 @@
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "match.h"
 #include "stack.h"
 
@@ -20,7 +22,7 @@ int match_string(char s[], struct state *state, struct state *accepting_state) {
     if (can_take(t1, s, i)) {
       state = t1.to;
       if (i < strlen(s) && t1.sym == s[i]) i++;
-      stack_push(stack, stack_item_create(i, t2.to));
+      if (t2.to) stack_push(stack, backtrack_entry_create(i, t2.to));
 
     } else if (can_take(t2, s, i)) {
       state = t2.to;
@@ -28,17 +30,20 @@ int match_string(char s[], struct state *state, struct state *accepting_state) {
 
     } else {
       if (i == strlen(s) && state == accepting_state) break;
-      if (stack_size(stack) == 0) {
+      if (stack_empty(stack)) {
         state = &NOT_ACCEPTED;
         break;
       }
 
-      struct stack_item *stack_item = stack_pop(stack);
+      struct backtrack_entry *stack_item = stack_pop(stack);
       state = stack_item->state;
       i = stack_item->i;
+      free(stack_item);
     }
   }
+  
+  stack_free_items(stack);
+  free(stack);
 
-  stack_free(stack);
   return state == accepting_state;
 }

@@ -2,46 +2,52 @@
 #include <stdio.h>
 #include "stack.h"
 
-struct stack_item *stack_item_create(int i, struct state *state) {
-  struct stack_item *stack_item = malloc(sizeof(struct stack_item));
-  stack_item->i = i;
-  stack_item->state = state;
-  return stack_item;
+struct backtrack_entry *backtrack_entry_create(int i, struct state *state) {
+  struct backtrack_entry *be = malloc(sizeof(struct backtrack_entry));
+  be->i = i;
+  be->state = state;
+  return be;
 }
 
 struct stack *stack_create() {
   struct stack *stack = malloc(sizeof(struct stack));
   stack->top = 0;
-  stack->capacity = MAX_STACK_SIZE - 1;
   return stack;
 }
 
-void stack_push(struct stack *stack, struct stack_item *item) {
-  if (stack->top == stack->capacity) {
-    printf("stack_push: stack is full");
+void stack_push(struct stack *stack, void *item) {
+  if (stack->top == MAX_STACK_SIZE - 1) {
+    printf("stack_push: stack is full\n");
     return;
   }
-  // Push only if it exists
-  if (item->state) {
-    stack->items[stack->top++] = item;
-  }
+  stack->items[stack->top++] = item;
 }
 
-struct stack_item *stack_pop(struct stack *stack) {
+void *stack_pop(struct stack *stack) {
   if (stack->top == 0) {
-    printf("stack_pop: stack is empty");
+    printf("stack_pop: stack is empty\n");
     return NULL;
   }
   return stack->items[--stack->top];
 }
 
-int stack_size(struct stack *stack) {
-  return stack->top;
+void *stack_peek(struct stack *stack) {
+  if (stack->top == 0) {
+    printf("stack_peek: stack is empty\n");
+    return NULL;
+  }
+  return stack->items[stack->top - 1];
 }
 
-void stack_free(struct stack *stack) {
+void stack_free_items(struct stack *stack) {
   for (int i = 0; i < stack->top; i++) {
     free(stack->items[i]);
   }
-  free(stack);
+  for (int i = 0; i < stack->to_free_top; i++) {
+    free(stack->to_free[i]);
+  }
+}
+
+int stack_empty(struct stack *stack) {
+  return stack->top == 0;
 }

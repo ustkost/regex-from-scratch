@@ -1,10 +1,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-
 #include "match.h"
-
-#define ARRAY_SIZE(x) ((sizeof x) / (sizeof *x))
 
 struct test_match {
   char *s;
@@ -20,7 +17,7 @@ void run_tests(
 ) {
   printf("\n============================\n");
   printf("%s\n", message);
-  printf("\n============================\n");
+  printf("============================\n\n");
   for (int i = 0; i < n; i++) {
     char *s = tests[i].s;
     int expected = tests[i].expected;
@@ -72,7 +69,7 @@ void test_match_1() {
   run_tests(
     "test_match_1: \"ab\"",
     tests,
-    ARRAY_SIZE(tests),
+    sizeof(tests)/sizeof(tests[0]),
     initial,
     accepting_state
   );
@@ -126,7 +123,7 @@ void test_match_2() {
   run_tests(
     "test_match_2: \"ab*\"",
     tests,
-    ARRAY_SIZE(tests),
+    sizeof(tests)/sizeof(tests[0]),
     initial,
     accepting_state
   );
@@ -190,7 +187,7 @@ void test_match_3() {
   run_tests(
     "test_match_3: \"a|b\"",
     tests,
-    ARRAY_SIZE(tests),
+    sizeof(tests)/sizeof(tests[0]),
     initial,
     accepting_state
   );
@@ -253,7 +250,7 @@ void test_match_4() {
   run_tests(
     "test_match_4: \"(a|b)c\"",
     tests,
-    ARRAY_SIZE(tests),
+    sizeof(tests)/sizeof(tests[0]),
     initial,
     accepting_state
   );
@@ -323,20 +320,8 @@ void test_match_5() {
   run_tests(
     "test_match_5: \"(a|b)*\"",
     tests,
-    ARRAY_SIZE(tests),
+    sizeof(tests)/sizeof(tests[0]),
     initial,
     accepting_state
   );
-}
-
-void test() {
-  printf("Running tests...\n");
-
-  test_match_1();
-  test_match_2();
-  test_match_3();
-  test_match_4();
-  test_match_5();
-
-  printf("\nAll tests pass!\n");
 }
