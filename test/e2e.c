@@ -90,8 +90,10 @@ void test_e2e() {
     char error[MAX_PARSER_ERROR];
     parser(regex, postfix_regex, error);
     
-    struct fragment *f = thompson(postfix_regex);
-    int actual = match_string(s, &f->s, &f->t);
+    struct nfa *nfa = thompson(postfix_regex);
+    struct fragment *root = nfa->root;
+    int actual = match_string(s, &root->start, &root->end);
+    free_nfa(nfa);
 
     printf("Test case %d: regex=%s, s=%s, expected=%d, got=%d\n", i, regex, s, expected, actual);
     assert(actual == expected);

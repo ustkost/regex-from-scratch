@@ -2,6 +2,7 @@
 #define THOMPSON_H
 
 #define EPS 256
+#define MAX_FRAG_COUNT 1024
 
 struct transition {
   int sym;
@@ -14,10 +15,17 @@ struct state {
 };
 
 struct fragment {
-  struct state s;
-  struct state t;
+  struct state start;
+  struct state end;
 };
 
-struct fragment *thompson(const char *postfix_regex);
+struct nfa {
+  struct fragment *root;
+  struct fragment *frags[MAX_FRAG_COUNT];
+  int frag_count;
+};
+
+void free_nfa(struct nfa *nfa);
+struct nfa *thompson(const char *postfix_regex);
 
 #endif

@@ -4,6 +4,11 @@
 #include "parser.h"
 #include "stack.h"
 
+struct operator {
+  char op;
+  int prec;
+};
+
 struct operator ops[] = {
   {'*', 3},
   {'.', 2},
@@ -98,7 +103,7 @@ int parser(const char *regex, char *output, char *error) {
       }
     }
   }
-  
+
   while (!stack_empty(stack)) {
     char c = pop_char(stack);
     if (c == '(') {

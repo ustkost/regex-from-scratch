@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "print.h"
 #include "stack.h"
 
@@ -26,47 +27,48 @@ static int get_ind(
   return -1;
 }
 
-void print(const struct fragment *f) {
+void print(const struct fragment *frag) {
   struct state *visited[MAX_TRANSITION_COUNT] = {0};
   int visitor_count = 0;
   struct stack *stack = stack_create();
-  stack_push(stack, &f->s);
+  stack_push(stack, &frag->start);
 
   while (!stack_empty(stack)) {
-    struct state *s = stack_pop(stack);
-    if (s->t1.to && !is_visited(visited, s->t1.to, visitor_count)) {
-      stack_push(stack, s->t1.to);
+    struct state *state = stack_pop(stack);
+    if (state->t1.to && !is_visited(visited, state->t1.to, visitor_count)) {
+      stack_push(stack, state->t1.to);
     }
-    if (s->t2.to && !is_visited(visited, s->t2.to, visitor_count)) {
-      stack_push(stack, s->t2.to);
+    if (state->t2.to && !is_visited(visited, state->t2.to, visitor_count)) {
+      stack_push(stack, state->t2.to);
     }
-    visited[visitor_count++] = s;
+    visited[visitor_count++] = state;
   }
 
   for (int i = 0; i < visitor_count; i++) {
-    struct state *s = visited[i];
-    printf("addr=%p\n", s);
-    if (s == &f->s) printf("(initial)\n");
-    if (s == &f->t) printf("(accepting)\n");
-    if (s->t1.to) {
+    struct state *state = visited[i];
+    if (state == &frag->start) printf("(initial)\n");
+    if (state == &frag->end) printf("(accepting)\n");
+    if (state->t1.to) {
       printf(
         "q%d ---%c--> q%d\n",
         i,
-        s->t1.sym == EPS ? '~' : s->t1.sym,
-        get_ind(visited, s->t1.to, visitor_count)
+        state->t1.sym == EPS ? '~' : state->t1.sym,
+        get_ind(visited, state->t1.to, visitor_count)
       );
     }
-    if (s->t2.to) {
+    if (state->t2.to) {
       printf(
         "q%d ---%c--> q%d\n",
         i,
-        s->t2.sym == EPS ? '~' : s->t2.sym,
-        get_ind(visited, s->t2.to, visitor_count)
+        state->t2.sym == EPS ? '~' : state->t2.sym,
+        get_ind(visited, state->t2.to, visitor_count)
       );
     }
-    if (!s->t1.to && !s->t2.to) {
+    if (!state->t1.to && !state->t2.to) {
       printf("q%d - no transitions\n", i);
     }
     printf("\n");
   }
+
+  free(stack);
 }

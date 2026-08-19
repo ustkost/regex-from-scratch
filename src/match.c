@@ -5,25 +5,28 @@
 #include "stack.h"
 
 struct backtrack_entry {
+  int index;
   struct state *state;
-  int i;
 };
 
-static struct backtrack_entry *backtrack_entry_create(int i, const struct state *s) {
+static struct backtrack_entry *backtrack_entry_create(
+  int index,
+  const struct state *state
+) {
   struct backtrack_entry *be = malloc(sizeof(struct backtrack_entry));
-  be->i = i;
-  be->state = s;
+  be->index = index;
+  be->state = state;
   return be;
 }
 
-static int can_take(struct transition t, const char s[], int i) {
+static int can_take(struct transition t, const char *s, int i) {
   if (!t.to) return 0;
   if (t.sym == EPS) return 1;
   return i < strlen(s) && t.sym == s[i];
 }
 
 int match_string(
-  const char s[],
+  const char *s,
   const struct state *state,
   const struct state *accepting_state
 ) {
@@ -39,11 +42,9 @@ int match_string(
       state = t1.to;
       if (i < strlen(s) && t1.sym == s[i]) i++;
       if (t2.to) stack_push(stack, backtrack_entry_create(i, t2.to));
-
     } else if (can_take(t2, s, i)) {
       state = t2.to;
       if (i < strlen(s) && t2.sym == s[i]) i++;
-
     } else {
       if (i == strlen(s) && state == accepting_state) break;
       if (stack_empty(stack)) {
@@ -53,7 +54,7 @@ int match_string(
 
       struct backtrack_entry *stack_item = stack_pop(stack);
       state = stack_item->state;
-      i = stack_item->i;
+      i = stack_item->index;
       free(stack_item);
     }
   }

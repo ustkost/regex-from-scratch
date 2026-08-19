@@ -10,7 +10,8 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
 CC := gcc
-CFLAGS := -Wall -g
+CFLAGS := -Wall -g # -fsanitize=address
+# LDFLAGS := -fsanitize=address
 CPPFLAGS := -I$(INC_DIR) -MMD -MP
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
