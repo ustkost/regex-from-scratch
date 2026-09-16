@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "stack.h"
 
 struct stack *stack_create() {
@@ -10,7 +8,9 @@ struct stack *stack_create() {
 
 void stack_push(struct stack *stack, const void *item) {
   if (stack->top == MAX_STACK_SIZE - 1) {
-    printf("stack_push: stack is full\n");
+    if (DEBUG) {
+      printf("stack_push: stack is full\n");
+    }
     return;
   }
   stack->items[stack->top++] = item;
@@ -18,7 +18,9 @@ void stack_push(struct stack *stack, const void *item) {
 
 void *stack_pop(struct stack *stack) {
   if (stack->top == 0) {
-    printf("stack_pop: stack is empty\n");
+    if (DEBUG) {
+      printf("stack_pop: stack is empty\n");
+    }
     return NULL;
   }
   return stack->items[--stack->top];
@@ -26,7 +28,9 @@ void *stack_pop(struct stack *stack) {
 
 void *stack_peek(const struct stack *stack) {
   if (stack->top == 0) {
-    printf("stack_peek: stack is empty\n");
+    if (DEBUG) {
+      printf("stack_peek: stack is empty\n");
+    }
     return NULL;
   }
   return stack->items[stack->top - 1];

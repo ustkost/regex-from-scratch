@@ -1,8 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "match.h"
-#include "stack.h"
 
 struct backtrack_entry {
   int index;
@@ -58,7 +54,7 @@ int match_string(
       free(stack_item);
     }
   }
-  
+
   stack_free_items(stack);
   free(stack);
 

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "match.h"
 #include "thompson.h"
-#include "parser.h"
+#include "parse.h"
 
 struct test_e2e {
   char *regex;
@@ -87,10 +87,10 @@ void test_e2e() {
     int expected = tests[i].expected;
 
     char postfix_regex[MAX_PARSER_OUTPUT];
-    char error[MAX_PARSER_ERROR];
-    parser(regex, postfix_regex, error);
+    char error[MAX_ERROR];
+    parse(regex, postfix_regex, error);
     
-    struct nfa *nfa = thompson(postfix_regex);
+    struct nfa *nfa = thompson(postfix_regex, error);
     struct fragment *root = nfa->root;
     int actual = match_string(s, &root->start, &root->end);
     free_nfa(nfa);

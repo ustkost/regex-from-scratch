@@ -1,8 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "parser.h"
-#include "stack.h"
+#include "parse.h"
 
 struct operator {
   char op;
@@ -43,7 +39,7 @@ static int can_end_expr(char c) {
   return is_lit(c) || c == ')' || c == '*';
 }
 
-void preprocess(const char *regex, char *output) {
+int preprocess(const char *regex, char *output, char *error) {
   int j = 0;
   for (int i = 0; regex[i] != '\0'; i++) {
     char current = regex[i];
@@ -58,7 +54,14 @@ void preprocess(const char *regex, char *output) {
       output[j++] = '.';
     }
   }
+
   output[j] = '\0';
+
+  if (j >= MAX_PARSER_OUTPUT) {
+    sprintf(error, "preprocess: result string length (%d) exceeded maximum value (%d)", j, MAX_PARSER_OUTPUT);
+    return -1;
+  }
+  return 0;
 }
 
 static char peek_char(const struct stack *s) {
@@ -69,10 +72,13 @@ static char pop_char(struct stack *s) {
   return *(char*)stack_pop(s);
 }
 
-int parser(const char *regex, char *output, char *error) {
+int parse(const char *regex, char *output, char *error) {
   int j = 0;
   char s[MAX_PARSER_OUTPUT];
-  preprocess(regex, s);
+  int preproc_status = preprocess(regex, s, error);
+  if (preproc_status == -1) {
+    return -1;
+  }
   struct stack *stack = stack_create();
 
   for (int i = 0; s[i] != '\0'; i++) {
@@ -97,7 +103,7 @@ int parser(const char *regex, char *output, char *error) {
       if (!stack_empty(stack) && peek_char(stack) == '(') {
         stack_pop(stack);
       } else {
-        sprintf(error, "unmatched ')' at position %d", i);
+        sprintf(error, "parse: unmatched ')' at position %d", i);
         free(stack);
         return -1;
       }
@@ -107,14 +113,19 @@ int parser(const char *regex, char *output, char *error) {
   while (!stack_empty(stack)) {
     char c = pop_char(stack);
     if (c == '(') {
-      sprintf(error, "unmatched '(' (unclosed at the end of expression)");
+      sprintf(error, "parse: unmatched '(' (unclosed at the end of expression)");
       free(stack);
       return -1;
     }
     output[j++] = c;
   }
-  output[j] = '\0';
 
+  output[j] = '\0';
   free(stack);
+
+  if (j >= MAX_PARSER_OUTPUT) {
+    sprintf(error, "parse: result string length (%d) exceeded maximum value (%d)", j, MAX_PARSER_OUTPUT);
+    return -1;
+  }
   return 0;
 }

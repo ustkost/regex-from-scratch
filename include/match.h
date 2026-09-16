@@ -1,6 +1,10 @@
 #ifndef MATCH_H
 #define MATCH_H
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "stack.h"
 #include "thompson.h"
 
 int match_string(

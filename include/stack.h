@@ -2,6 +2,10 @@
 #define STACK_H
 
 #define MAX_STACK_SIZE 4096
+#define DEBUG 1
+
+#include <stdlib.h>
+#include <stdio.h>
 
 struct stack {
   void *items[MAX_STACK_SIZE];

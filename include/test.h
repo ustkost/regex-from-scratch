@@ -9,7 +9,7 @@ void test_match_5();
 
 void test_preproc();
 
-void test_parser();
+void test_parse();
 
 void test_e2e();
 

@@ -12,7 +12,7 @@ void test() {
 
   test_preproc();
 
-  test_parser();
+  test_parse();
 
   test_e2e();
 

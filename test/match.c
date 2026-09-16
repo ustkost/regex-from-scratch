@@ -1,6 +1,4 @@
 #include <assert.h>
-#include <stddef.h>
-#include <stdio.h>
 #include "match.h"
 
 struct test_match {

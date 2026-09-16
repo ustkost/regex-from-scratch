@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include "parser.h"
+#include "parse.h"
 
 struct test_preproc {
   char *s;
@@ -33,9 +33,10 @@ void test_preproc() {
   for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
     char *s = tests[i].s;
     char *expected = tests[i].expected;
+    char error[MAX_ERROR];
     char actual[MAX_PARSER_OUTPUT];
 
-    preprocess(s, actual);
+    preprocess(s, actual, error);
     printf("Test case %d: s=%s, expected=%s, got=%s\n", i, s, expected, actual);
     assert(strcmp(actual, expected) == 0);
   }

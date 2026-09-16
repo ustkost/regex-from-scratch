@@ -4,6 +4,11 @@
 #define EPS 256
 #define MAX_FRAG_COUNT 1024
 
+#include <stdlib.h>
+#include <stdio.h>
+#include "stack.h"
+#include "parse.h"
+
 struct transition {
   int sym;
   struct state *to;
@@ -26,6 +31,6 @@ struct nfa {
 };
 
 void free_nfa(struct nfa *nfa);
-struct nfa *thompson(const char *postfix_regex);
+struct nfa *thompson(const char *postfix_regex, char *error);
 
 #endif

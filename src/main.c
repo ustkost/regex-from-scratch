@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "match.h"
 #include "test.h"
-#include "parser.h"
+#include "parse.h"
 #include "thompson.h"
 #include "print.h"
 
@@ -16,14 +16,18 @@ int main(int argc, char **argv) {
     char *s = argv[2];
 
     char postfix_regex[MAX_PARSER_OUTPUT];
-    char error[MAX_PARSER_ERROR];
-    int i = parser(regex, postfix_regex, error);
+    char error[MAX_ERROR];
+    int i = parse(regex, postfix_regex, error);
     if (i == -1) {
       printf("%s\n", error);
       return 1;
     }
 
-    struct nfa *nfa = thompson(postfix_regex);
+    struct nfa *nfa = thompson(postfix_regex, error);
+    if (!nfa) {
+      printf("%s\n", error);
+      return 1;
+    }
     struct fragment *root = nfa->root;
     print(root);
 
@@ -33,10 +37,10 @@ int main(int argc, char **argv) {
     } else {
       printf("Rejected\n");
     }
-    
+
     free_nfa(nfa);
   } else {
     printf("usage something bla bla\n");
-  } 
+  }
   return 0;
 }
