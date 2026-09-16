@@ -3,7 +3,7 @@
 TARGET_EXEC := regex
 BUILD_DIR := ./build
 SRC_DIRS := ./src ./test
-INC_DIR := ./include
+INC_DIRS := ./src ./test
 
 SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -12,7 +12,7 @@ DEPS := $(OBJS:.o=.d)
 CC := gcc
 CFLAGS := -Wall -g # -fsanitize=address
 # LDFLAGS := -fsanitize=address
-CPPFLAGS := -I$(INC_DIR) -MMD -MP
+CPPFLAGS := $(addprefix -I,$(INC_DIR)) -MMD -MP
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "match.h"
+#include "../src/match/match.h"
 
 struct test_match {
   char *s;

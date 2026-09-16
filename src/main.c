@@ -1,11 +1,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "match.h"
-#include "test.h"
-#include "parse.h"
-#include "thompson.h"
-#include "print.h"
+#include "match/match.h"
+#include "parse/parse.h"
+#include "thompson/thompson.h"
+#include "print/print.h"
+#include "../test/test.h"
 
 int main(int argc, char **argv) {
   if (argc == 2 && strcmp(argv[1], "--test") == 0) {

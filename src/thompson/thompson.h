@@ -6,8 +6,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "stack.h"
-#include "parse.h"
+#include "../stack/stack.h"
+#include "../parse/parse.h"
 
 struct transition {
   int sym;

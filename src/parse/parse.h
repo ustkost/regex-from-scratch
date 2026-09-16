@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
+#include "../stack/stack.h"
 
 int is_lit(char c);
 int is_op(char c);

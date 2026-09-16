@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
-#include "thompson.h"
+#include "../stack/stack.h"
+#include "../thompson/thompson.h"
 
 int match_string(
   const char s[],

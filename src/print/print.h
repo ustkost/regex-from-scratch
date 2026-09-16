@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
-#include "thompson.h"
+#include "../stack/stack.h"
+#include "../thompson/thompson.h"
 
 void print(const struct fragment *f);
 

@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "match.h"
-#include "thompson.h"
-#include "parse.h"
+#include "../src/match/match.h"
+#include "../src/thompson/thompson.h"
+#include "../src/parse/parse.h"
 
 struct test_e2e {
   char *regex;

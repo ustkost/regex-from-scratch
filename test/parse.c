@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include "parse.h"
+#include "../src/parse/parse.h"
 
 struct test_parse {
   char *s;
