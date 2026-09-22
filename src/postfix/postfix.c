@@ -5,21 +5,17 @@ struct operator {
   int prec;
 };
 
-struct operator ops[] = {
-  {T_STAR, 3},
-  {T_CAT, 2},
-  {T_OR, 1}
-};
+struct operator ops[] = {{T_STAR, 3}, {T_CAT, 2}, {T_OR, 1}};
 
 int is_op(struct token t) {
-  for (int i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+  for (int i = 0; i < sizeof(ops) / sizeof(ops[0]); i++) {
     if (t.type == ops[i].op) return 1;
   }
   return 0;
 }
 
 static int get_op_prec(struct token t) {
- for (int i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+  for (int i = 0; i < sizeof(ops) / sizeof(ops[0]); i++) {
     if (t.type == ops[i].op) {
       return ops[i].prec;
     }
@@ -28,14 +24,15 @@ static int get_op_prec(struct token t) {
 }
 
 static struct token peek_token(const struct stack *s) {
-  return *(struct token*)stack_peek(s);
+  return *(struct token *)stack_peek(s);
 }
 
 static struct token pop_token(struct stack *s) {
-  return *(struct token*)stack_pop(s);
+  return *(struct token *)stack_pop(s);
 }
 
-int to_postfix(const struct token_array *src, struct token_array *dst, char *error) {
+int to_postfix(const struct token_array *src, struct token_array *dst,
+               char *error) {
   int j = 0;
   dst->tokens = malloc(sizeof(struct token) * src->size);
 
@@ -48,11 +45,8 @@ int to_postfix(const struct token_array *src, struct token_array *dst, char *err
     if (t.type == T_LIT) {
       dst->tokens[j++] = t;
     } else if (is_op(t)) {
-      while (
-        !stack_empty(stack) &&
-        is_op(peek_token(stack)) &&
-        get_op_prec(peek_token(stack)) >= get_op_prec(t)
-      ) {
+      while (!stack_empty(stack) && is_op(peek_token(stack)) &&
+             get_op_prec(peek_token(stack)) >= get_op_prec(t)) {
         dst->tokens[j++] = pop_token(stack);
       }
       stack_push(stack, &src->tokens[i]);
@@ -71,7 +65,7 @@ int to_postfix(const struct token_array *src, struct token_array *dst, char *err
       }
     }
   }
-  
+
   while (!stack_empty(stack)) {
     struct token t = pop_token(stack);
     if (t.type == T_LPAR) {

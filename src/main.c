@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     char *regex = argv[1];
     char *str = argv[2];
     char error[MAX_ERROR];
- 
+
     struct nfa nfa = {0};
     if (regex_to_nfa(regex, &nfa, error) != 0) {
       fprintf(stderr, "%s\n", error);

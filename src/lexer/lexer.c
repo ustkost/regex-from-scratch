@@ -8,7 +8,7 @@ int lexer(const char *src, struct token_array *dst, char *error) {
     char c = src[i];
 
     dst->tokens[i].val = c;
-    dst->tokens[i].pos =  i + 1;
+    dst->tokens[i].pos = i + 1;
 
     switch (c) {
       case '(':

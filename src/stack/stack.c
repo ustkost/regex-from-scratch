@@ -42,6 +42,4 @@ void stack_free_items(struct stack *stack) {
   }
 }
 
-int stack_empty(const struct stack *stack) {
-  return stack->top == 0;
-}
+int stack_empty(const struct stack *stack) { return stack->top == 0; }

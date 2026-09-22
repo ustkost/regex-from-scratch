@@ -10,6 +10,7 @@
 #include "../token/token.h"
 
 int is_op(struct token t);
-int to_postfix(const struct token_array *src, struct token_array *dst, char *error);
+int to_postfix(const struct token_array *src, struct token_array *dst,
+               char *error);
 
 #endif

@@ -6,9 +6,7 @@ struct backtrack_entry {
 };
 
 static struct backtrack_entry *backtrack_entry_create(
-  int index,
-  const struct state *state
-) {
+    int index, const struct state *state) {
   struct backtrack_entry *be = malloc(sizeof(struct backtrack_entry));
   be->index = index;
   be->state = state;
@@ -21,11 +19,8 @@ static int can_take(struct transition t, const char *s, int i) {
   return i < strlen(s) && t.sym == s[i];
 }
 
-int match_string(
-  const char *s,
-  const struct state *state,
-  const struct state *accepting_state
-) {
+int match_string(const char *s, const struct state *state,
+                 const struct state *accepting_state) {
   int i = 0;
   struct state NOT_ACCEPTED = {0};
   struct stack *stack = stack_create();
