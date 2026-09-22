@@ -1,46 +1,39 @@
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "match/match.h"
-#include "parse/parse.h"
-#include "thompson/thompson.h"
-#include "print/print.h"
-#include "../test/test.h"
+#include "compile_regex/compile_regex.h"
+#include "print_nfa/print_nfa.h"
+// #include "../test/test.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
   if (argc == 2 && strcmp(argv[1], "--test") == 0) {
-    test();
+    // test();
     return 0;
   } else if (argc == 3) {
     char *regex = argv[1];
-    char *s = argv[2];
-
-    char postfix_regex[MAX_PARSER_OUTPUT];
+    char *str = argv[2];
     char error[MAX_ERROR];
-    int i = parse(regex, postfix_regex, error);
-    if (i == -1) {
-      printf("%s\n", error);
+ 
+    struct nfa nfa = {0};
+    if (regex_to_nfa(regex, &nfa, error) != 0) {
+      fprintf(stderr, "%s\n", error);
+      free_nfa(&nfa);
       return 1;
     }
+    struct fragment *root = nfa.root;
+    print_nfa(root);
 
-    struct nfa *nfa = thompson(postfix_regex, error);
-    if (!nfa) {
-      printf("%s\n", error);
-      return 1;
-    }
-    struct fragment *root = nfa->root;
-    print(root);
-
-    int res = match_string(s, &root->start, &root->end);
+    int res = match_string(str, &root->start, &root->end);
     if (res) {
       printf("Accepted\n");
     } else {
       printf("Rejected\n");
     }
 
-    free_nfa(nfa);
+    free_nfa(&nfa);
+    return 0;
   } else {
-    printf("usage something bla bla\n");
+    fprintf(stderr, "usage: %s <regex> <string>\n", argv[0]);
+    return 1;
   }
-  return 0;
 }

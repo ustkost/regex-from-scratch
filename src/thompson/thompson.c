@@ -17,26 +17,24 @@ void free_nfa(struct nfa *nfa) {
   for (int i = 0; i < nfa->frag_count; i++) {
     free(nfa->frags[i]);
   }
-  free(nfa);
 }
 
-struct nfa *thompson(const char *postfix_regex, char *error) {
+int thompson(const struct token_array *ta, struct nfa *nfa, char *error) {
   struct stack *stack = stack_create();
-  struct nfa *nfa = malloc(sizeof(struct nfa));
   nfa->frag_count = 0;
 
-  for (int i = 0; postfix_regex[i] != '\0'; i++) {
-    char c = postfix_regex[i];
+  for (int i = 0; i < ta->size ; i++) {
+    struct token t = ta->tokens[i];
 
-    if (is_lit(c)) { // frag = 'a'
+    if (t.type == T_LIT) { // frag = 'a'
       struct fragment *frag = create_fragment();
-      frag->start.t1 = (struct transition){ .sym = c, .to = &frag->end };
+      frag->start.t1 = (struct transition){ .sym = t.val, .to = &frag->end };
       nfa->frags[nfa->frag_count++] = frag;
 
       stack_push(stack, frag);
-    } else if (is_op(c)) {
-      switch (c) {
-        case '.': { // frag = lhs.rhs
+    } else if (is_op(t)) {
+      switch (t.type) {
+        case T_CAT: { // frag = lhs.rhs
           struct fragment *rhs = stack_pop(stack);
           struct fragment *lhs = stack_pop(stack);
 
@@ -44,7 +42,7 @@ struct nfa *thompson(const char *postfix_regex, char *error) {
             sprintf(error, "thompson: could not retrieve fragments for concatenation");
             free_nfa(nfa);
             free(stack);
-            return NULL;
+            return -1;
           }
           struct fragment *frag = create_fragment();
 
@@ -55,14 +53,14 @@ struct nfa *thompson(const char *postfix_regex, char *error) {
           stack_push(stack, frag);
 
           break;
-        } case '|': { // frag = lhs|rhs
+        } case T_OR: { // frag = lhs|rhs
           struct fragment *rhs = stack_pop(stack);
           struct fragment *lhs = stack_pop(stack);
           if (!rhs || !lhs) {
             sprintf(error, "thompson: could not retrieve fragments for union");
             free_nfa(nfa);
             free(stack);
-            return NULL;
+            return -1;
           }
           struct fragment *frag = create_fragment();
 
@@ -77,14 +75,14 @@ struct nfa *thompson(const char *postfix_regex, char *error) {
           stack_push(stack, frag);
 
           break;
-        } case '*': { // frag = prev*
+        } case T_STAR: { // frag = prev*
           struct fragment *prev = stack_pop(stack);
 
           if (!prev) {
             sprintf(error, "thompson: could not retrieve fragment for kleene star");
             free_nfa(nfa);
             free(stack);
-            return NULL;
+            return -1;
           }
           struct fragment *frag = create_fragment();
 
@@ -101,27 +99,30 @@ struct nfa *thompson(const char *postfix_regex, char *error) {
           stack_push(stack, frag);
 
           break;
+        } default: {
+          sprintf(error, "thompson: unsupported operator type");
+          free(nfa);
+          free(stack);
+          return -1;
         }
       }
     } else {
-      sprintf(error, "thompson: unknown sym: %c", c);
+      sprintf(error, "thompson: unknown sym: %c", t.val);
       free_nfa(nfa);
       free(stack);
-      return NULL;
+      return -1;
     }
   }
-
-
 
   struct fragment *res = stack_pop(stack);
 
   if (!stack_empty(stack) || !res) {
-      sprintf(error, "thompson: stack is malformed");
-      free_nfa(nfa);
-      free(stack);
-      return NULL;
+    sprintf(error, "thompson: stack is malformed");
+    free_nfa(nfa);
+    free(stack);
+    return -1;
   }
   nfa->root = res;
   free(stack);
-  return nfa;
+  return 0;
 }

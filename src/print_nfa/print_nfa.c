@@ -1,4 +1,4 @@
-#include "print.h"
+#include "print_nfa.h"
 
 #define MAX_STATE_COUNT 1024
 
@@ -24,7 +24,7 @@ static int get_ind(
   return -1;
 }
 
-void print(const struct fragment *frag) {
+void print_nfa(const struct fragment *frag) {
   struct state *visited[MAX_STATE_COUNT] = {0};
   int visitor_count = 0;
   struct stack *stack = stack_create();

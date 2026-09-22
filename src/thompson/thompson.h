@@ -6,8 +6,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "../token/token.h"
 #include "../stack/stack.h"
-#include "../parse/parse.h"
+#include "../postfix/postfix.h"
 
 struct transition {
   int sym;
@@ -31,6 +32,6 @@ struct nfa {
 };
 
 void free_nfa(struct nfa *nfa);
-struct nfa *thompson(const char *postfix_regex, char *error);
+int thompson(const struct token_array *ta, struct nfa *nfa, char *error);
 
 #endif

@@ -6,6 +6,6 @@
 #include "../stack/stack.h"
 #include "../thompson/thompson.h"
 
-void print(const struct fragment *f);
+void print_nfa(const struct fragment *f);
 
 #endif
