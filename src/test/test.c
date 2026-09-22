@@ -1,18 +1,13 @@
-#include <assert.h>
-#include <stddef.h>
-#include <stdio.h>
-#include "../src/match/match.h"
-#include "../src/thompson/thompson.h"
-#include "../src/parse/parse.h"
+#include "test.h"
 
-struct test_e2e {
+struct test {
   char *regex;
   char *s;
   int expected;
 };
 
-void test_e2e() {
-  struct test_e2e tests[] = {
+void test() {
+  struct test tests[] = {
     {"ab", "ab", 1},
     {"ab", "", 0},
     {"ab", "a", 0},
@@ -54,7 +49,7 @@ void test_e2e() {
     {"a|b", "baaaaaa", 0},
     {"a|b", "aba", 0},
     {"a|b", "aaaaabaaaaa", 0},
-    
+
     {"(a|b)c", "ac", 1},
     {"(a|b)c", "bc", 1},
     {"(a|b)c", "a", 0},
@@ -64,7 +59,7 @@ void test_e2e() {
     {"(a|b)c", "abc", 0},
     {"(a|b)c", "acc", 0},
     {"(a|b)c", "aac", 0},
-    
+
     {"(a|b)*", "", 1},
     {"(a|b)*", "a", 1},
     {"(a|b)*", "b", 1},
@@ -78,24 +73,28 @@ void test_e2e() {
     {"(a|b)*", "aabbc", 0},
   };
 
-  printf("\n============================\n");
-  printf("test_e2e\n");
-  printf("============================\n\n");
+  printf("Running tests...\n");
+
   for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); i++) {
     char *s = tests[i].s;
     char *regex = tests[i].regex;
     int expected = tests[i].expected;
 
-    char postfix_regex[MAX_PARSER_OUTPUT];
     char error[MAX_ERROR];
-    parse(regex, postfix_regex, error);
-    
-    struct nfa *nfa = thompson(postfix_regex, error);
-    struct fragment *root = nfa->root;
+    struct nfa nfa = {0};
+    if (regex_to_nfa(regex, &nfa, error) != 0) {
+      fprintf(stderr, "%s\n", error);
+      free_nfa(&nfa);
+      assert(0);
+    }
+    struct fragment *root = nfa.root;
+
     int actual = match_string(s, &root->start, &root->end);
-    free_nfa(nfa);
+    free_nfa(&nfa);
 
     printf("Test case %d: regex=%s, s=%s, expected=%d, got=%d\n", i, regex, s, expected, actual);
     assert(actual == expected);
   }
+
+  printf("All tests passed successfully!\n");
 }

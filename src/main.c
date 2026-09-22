@@ -3,11 +3,11 @@
 #include "match/match.h"
 #include "compile_regex/compile_regex.h"
 #include "print_nfa/print_nfa.h"
-// #include "../test/test.h"
+#include "test/test.h"
 
 int main(int argc, char *argv[]) {
   if (argc == 2 && strcmp(argv[1], "--test") == 0) {
-    // test();
+    test();
     return 0;
   } else if (argc == 3) {
     char *regex = argv[1];
