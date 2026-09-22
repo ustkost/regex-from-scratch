@@ -7,14 +7,12 @@ A simple regular expression engine written in C from scratch.
 Takes a regex pattern and an input string, and checks if the string matches. Works as a
 pipeline:
 
-```
 0) get the raw regex string from the input
 1) lexer - tokenize the string
 2) preproc - insert explicit concatenation tokens: ab becomes a CONCAT b
 3) to_postfix - reorder the tokens to postfix notation with [Shunting yard algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm) ('a|b' becomes '|ab')
 4) thompson - perform [Thompson's construction](https://en.wikipedia.org/wiki/Thompson%27s_construction) - build [NFA](https://en.wikipedia.org/wiki/Nondeterministic_finite_automaton) from the postfix token array
 5) match - run the input string against the NFA, either accept or reject it (uses backtracking)
-```
 
 ## Supported regex syntax
 - `a`, `b`, ... - literals
